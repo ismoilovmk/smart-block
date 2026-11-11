@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to remove Top stories and news from Google Search results</title>
+<meta name="description" content="Google has no switch for Top stories. What works: the Web filter, the udm=14 trick, and a free Chrome extension that hides the news block.">
+<link rel="canonical" href="https://ismoilovmk.github.io/smart-block/remove-top-stories-google.html">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <a class="name" href="./">Smart Block</a>
+  <nav><a href="./">Home</a></nav>
+</header>
+<article class="guide">
+<h1>How to remove “Top stories” from Google Search</h1>
+<p class="updated">Updated November 2026</p>
+<p class="lead">You search for one thing and Google puts a row of headlines above the answer. There is no setting that turns the block off, but there are three ways around it.</p>
+<h2>1. The “Web” filter</h2>
+<p>Under the search box, open “More” and choose “Web”. Google then shows plain links only: no Top stories, no video carousel, no AI summary. You have to choose it again for every search.</p>
+<h2>2. Make “Web” the default with udm=14</h2>
+<p>The Web filter is the address parameter <code>udm=14</code>. In Chrome, open <code>chrome://settings/searchEngines</code>, add a search engine with the address below and make it the default:</p>
+<p><code>https://www.google.com/search?q=%s&amp;udm=14</code></p>
+<p>Every search from the address bar now opens in Web mode. You lose the useful extras too: maps, the calculator, quick answers.</p>
+<h2>3. Hide only the news</h2>
+<p><a href="./">Smart Block</a> is a free Chrome extension that removes just the news parts and leaves the rest of the results page as it was:</p>
+<ul class="plain"><li>the “Top stories” block in results;</li><li>the News tab under the search box;</li><li>news.google.com, which goes to the regular Google home page instead.</li></ul>
+<p class="callout">Looking for the news feed on your phone’s home screen or in the Google app? That is Google Discover, a different feature. It is switched off in the Google app settings, not in the browser.</p>
+<div class="getit">
+<h2>Get Smart Block</h2>
+<span class="cta soon">Chrome Web Store: in review</span>
+<p class="note">Free. No account. The install link will appear here once the store approves the first version.</p>
+</div>
+</article>
+<footer>Smart Block is an independent project, not affiliated with YouTube or Google. · <a href="privacy.html">Privacy</a> · <a href="https://github.com/ismoilovmk/smart-block/issues">Report a problem</a></footer>
+</div>
+</body>
+</html>

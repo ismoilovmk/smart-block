@@ -1,9 +1,14 @@
-"""Builds the static site: index.html, ru/index.html, privacy.html,
-ru/privacy.html. Run:  python build.py [path-to-PRIVACY.md]
+"""Builds the static site. Run:  python build.py [path-to-PRIVACY.md]
+
+Output: landing pages (index.html, ru/index.html), privacy pages, the
+how-to guides from guides.py, sitemap.xml and robots.txt.
 
 The privacy pages are generated from the extension's PRIVACY.md so the
 policy has one source of text. Without the argument the existing
-privacy.md copy in this folder is used."""
+privacy.md copy in this folder is used.
+
+Set STORE_URL once the extension is public: every install button on the
+site switches from "in review" to a real link."""
 import html
 import pathlib
 import re
@@ -11,10 +16,15 @@ import shutil
 import sys
 
 ROOT = pathlib.Path(__file__).parent
+sys.path.insert(0, str(ROOT))  # so `python -I build.py` finds guides.py
+
+from guides import GUIDES, UPDATED  # noqa: E402
+BASE = 'https://ismoilovmk.github.io/smart-block/'
 ISSUES = 'https://github.com/ismoilovmk/smart-block/issues'
+STORE_URL = None
 
 EN = dict(
-    lang='en', other_lang='ru', other_href='ru/', other='Русский', root='',
+    lang='en', path='', other_lang='ru', other_href='ru/', other='Русский', root='',
     title='Smart Block — remove YouTube Shorts and recommendations',
     meta='A free Chrome extension that removes YouTube Shorts, recommendations and the home feed, '
          'and the Top stories block in Google Search. Search and subscriptions keep working.',
@@ -22,8 +32,9 @@ EN = dict(
     h1='YouTube without <s>Shorts</s>.<br>Google without the <s>news block</s>.',
     lead='Smart Block is a Chrome extension that removes the feeds and leaves the rest working. '
          'You still search, watch and read. You just stop scrolling.',
-    cta='Chrome Web Store: in review',
-    note='Free. No account. The install link will appear here once the store approves the first version.',
+    cta_soon='Chrome Web Store: in review', cta='Add to Chrome — free',
+    note_soon='Free. No account. The install link will appear here once the store approves the first version.',
+    note='Free. No account. Nothing leaves your browser.',
     what='What goes, what stays', gone='Removed', stay='Still works',
     gone_items=['YouTube Shorts, everywhere', 'The YouTube home feed', 'Related videos and end screens',
                 'Comments, if you want', '“Top stories” in Google Search', 'The Google News tab'],
@@ -40,12 +51,13 @@ EN = dict(
     priv_h='Nothing leaves your browser',
     priv_p='No analytics, no tracking, no network requests, no account. The extension runs only on '
            'youtube.com and Google Search. The <a href="privacy.html">privacy policy</a> is one short page.',
+    guides_h='Guides', home='Home', get='Get Smart Block',
     footer='Smart Block is an independent project, not affiliated with YouTube or Google. · '
            f'<a href="privacy.html">Privacy</a> · <a href="{ISSUES}">Report a problem</a>',
 )
 
 RU = dict(
-    lang='ru', other_lang='en', other_href='../', other='English', root='../',
+    lang='ru', path='ru/', other_lang='en', other_href='../', other='English', root='../',
     title='Smart Block — убрать Shorts и рекомендации YouTube',
     meta='Бесплатное расширение для Chrome: убирает шортсы, рекомендации и ленту YouTube и блок '
          '«Главные новости» в поиске Google. Поиск и подписки работают как обычно.',
@@ -53,8 +65,9 @@ RU = dict(
     h1='YouTube без <s>Shorts</s>.<br>Google без <s>блока новостей</s>.',
     lead='Smart Block — расширение для Chrome, которое убирает ленты и оставляет всё остальное рабочим. '
          'Вы по-прежнему ищете, смотрите и читаете. Просто перестаёте листать.',
-    cta='Chrome Web Store: на проверке',
-    note='Бесплатно. Без аккаунта. Ссылка на установку появится здесь, когда стор одобрит первую версию.',
+    cta_soon='Chrome Web Store: на проверке', cta='Установить в Chrome — бесплатно',
+    note_soon='Бесплатно. Без аккаунта. Ссылка на установку появится здесь, когда стор одобрит первую версию.',
+    note='Бесплатно. Без аккаунта. Ничего не покидает ваш браузер.',
     what='Что уходит и что остаётся', gone='Убрано', stay='Работает как раньше',
     gone_items=['Шортсы YouTube, везде', 'Лента на главной YouTube', 'Похожие видео и подсказки в конце',
                 'Комментарии, если хотите', '«Главные новости» в поиске Google', 'Вкладка «Новости» в Google'],
@@ -72,23 +85,40 @@ RU = dict(
     priv_p='Нет аналитики, отслеживания, сетевых запросов и аккаунта. Расширение работает только на '
            'youtube.com и в поиске Google. <a href="privacy.html">Политика конфиденциальности</a> '
            'занимает одну короткую страницу.',
+    guides_h='Инструкции', home='Главная', get='Установить Smart Block',
     footer='Smart Block — независимый проект, не связанный с YouTube или Google. · '
            f'<a href="privacy.html">Конфиденциальность</a> · <a href="{ISSUES}">Сообщить о проблеме</a>',
 )
+
+SITE = {'en': EN, 'ru': RU}
 
 
 def items(xs):
     return ''.join(f'<li>{x}</li>' for x in xs)
 
 
-def shell(lang, title, root, nav, body, footer, meta=''):
-    meta_tag = f'\n<meta name="description" content="{meta}">' if meta else ''
+def cta(t):
+    if STORE_URL:
+        return f'<a class="cta" href="{STORE_URL}">{t["cta"]}</a>\n<p class="note">{t["note"]}</p>'
+    return f'<span class="cta soon">{t["cta_soon"]}</span>\n<p class="note">{t["note_soon"]}</p>'
+
+
+def shell(lang, title, root, nav, body, footer, path, meta='', alternates=None):
+    """One HTML page. `path` is the page's address relative to the site root;
+    `alternates` maps a language to the same page in that language."""
+    head = [f'<link rel="canonical" href="{BASE}{path}">']
+    if meta:
+        head.insert(0, f'<meta name="description" content="{html.escape(meta, quote=True)}">')
+    for alt_lang, alt_path in (alternates or {}).items():
+        head.append(f'<link rel="alternate" hreflang="{alt_lang}" href="{BASE}{alt_path}">')
+    extra = '\n'.join(head)
     return f'''<!doctype html>
 <html lang="{lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title}</title>{meta_tag}
+<title>{html.escape(title, quote=False)}</title>
+{extra}
 <link rel="stylesheet" href="{root}style.css">
 </head>
 <body>
@@ -105,14 +135,20 @@ def shell(lang, title, root, nav, body, footer, meta=''):
 '''
 
 
+def local(slug, lang):
+    """A guide's address as seen from a page of the same language."""
+    return slug[len(SITE[lang]['path']):]
+
+
 def landing(t):
     nav = (f'<a href="privacy.html">{t["privacy"]}</a>'
            f'<a href="{t["other_href"]}" lang="{t["other_lang"]}">{t["other"]}</a>')
+    guide_links = items(f'<a href="{local(g["slug"], t["lang"])}">{g["h1"]}</a>'
+                        for g in GUIDES if g['lang'] == t['lang'])
     body = f'''<main>
 <h1>{t["h1"]}</h1>
 <p class="lead">{t["lead"]}</p>
-<span class="cta soon">{t["cta"]}</span>
-<p class="note">{t["note"]}</p>
+{cta(t)}
 
 <h2>{t["what"]}</h2>
 <div class="cols">
@@ -125,8 +161,47 @@ def landing(t):
 
 <h2>{t["priv_h"]}</h2>
 <p>{t["priv_p"]}</p>
+
+<h2>{t["guides_h"]}</h2>
+<ul class="plain guides">{guide_links}</ul>
 </main>'''
-    return shell(t['lang'], t['title'], t['root'], nav, body, t['footer'], t['meta'])
+    alternates = {'en': EN['path'], 'ru': RU['path']}
+    return shell(t['lang'], t['title'], t['root'], nav, body, t['footer'], t['path'], t['meta'], alternates)
+
+
+def block(kind, content):
+    if kind == 'h2':
+        return f'<h2>{content}</h2>'
+    if kind == 'p':
+        return f'<p>{content}</p>'
+    if kind == 'note':
+        return f'<p class="callout">{content}</p>'
+    if kind in ('ol', 'ul'):
+        return f'<{kind} class="plain">{items(content)}</{kind}>'
+    raise ValueError(f'unknown block {kind}')
+
+
+def guide(g):
+    t = SITE[g['lang']]
+    nav = f'<a href="./">{t["home"]}</a>'
+    alternates = None
+    if g['pair']:
+        other = SITE[t['other_lang']]
+        href = t['other_href'] + local(g['pair'], other['lang'])
+        nav += f'<a href="{href}" lang="{other["lang"]}">{t["other"]}</a>'
+        alternates = {g['lang']: g['slug'], other['lang']: g['pair']}
+    parts = '\n'.join(block(kind, content) for kind, content in g['body'])
+    body = f'''<article class="guide">
+<h1>{g["h1"]}</h1>
+<p class="updated">{UPDATED[g["lang"]]}</p>
+<p class="lead">{g["lead"]}</p>
+{parts}
+<div class="getit">
+<h2>{t["get"]}</h2>
+{cta(t)}
+</div>
+</article>'''
+    return shell(g['lang'], g['title'], t['root'], nav, body, t['footer'], g['slug'], g['meta'], alternates)
 
 
 def inline(s):
@@ -143,14 +218,14 @@ def join(lines):
 
 def markdown(text):
     out = []
-    for block in re.split(r'\n\s*\n', text.strip()):
-        lines = block.split('\n')
+    for chunk in re.split(r'\n\s*\n', text.strip()):
+        lines = chunk.split('\n')
         if lines[0].startswith('# '):
             out.append(f'<h1>{inline(lines[0][2:])}</h1>')
         elif lines[0].startswith('## '):
             out.append(f'<h2>{inline(lines[0][3:])}</h2>')
         elif lines[0].startswith('- '):
-            lis = [inline(join(i[2:].split('\n'))) for i in re.split(r'\n(?=- )', block)]
+            lis = [inline(join(i[2:].split('\n'))) for i in re.split(r'\n(?=- )', chunk)]
             out.append('<ul class="plain">' + items(lis) + '</ul>')
         else:
             out.append(f'<p>{inline(join(lines))}</p>')
@@ -161,25 +236,41 @@ def privacy_pages(source):
     text = source.read_text(encoding='utf-8')
     text = re.sub(r'https://github\.com/ismoilovmk/-?smart-block/issues', ISSUES, text)
     en_md, ru_md = text.split('\n---\n')
+    alternates = {'en': 'privacy.html', 'ru': 'ru/privacy.html'}
     en_nav = '<a href="./">Home</a><a href="ru/privacy.html" lang="ru">Русский</a>'
     ru_nav = '<a href="./">Главная</a><a href="../privacy.html" lang="en">English</a>'
-    en = shell('en', 'Privacy Policy — Smart Block', '', en_nav, f'<article>\n{markdown(en_md)}\n</article>', 'Smart Block')
+    en = shell('en', 'Privacy Policy — Smart Block', '', en_nav, f'<article>\n{markdown(en_md)}\n</article>',
+               'Smart Block', 'privacy.html', alternates=alternates)
     ru = shell('ru', 'Политика конфиденциальности — Smart Block', '../', ru_nav,
-               f'<article>\n{markdown(ru_md)}\n</article>', 'Smart Block')
+               f'<article>\n{markdown(ru_md)}\n</article>', 'Smart Block', 'ru/privacy.html', alternates=alternates)
     return en, ru
+
+
+def sitemap(paths):
+    urls = '\n'.join(f'  <url><loc>{BASE}{p}</loc></url>' for p in paths)
+    return f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{urls}\n</urlset>\n'
+
+
+def write(path, text):
+    target = ROOT / path
+    target.parent.mkdir(exist_ok=True)
+    target.write_text(text, encoding='utf-8')
 
 
 def main():
     copy = ROOT / 'privacy.md'
     if len(sys.argv) > 1:
         shutil.copyfile(sys.argv[1], copy)
-    (ROOT / 'ru').mkdir(exist_ok=True)
-    (ROOT / 'index.html').write_text(landing(EN), encoding='utf-8')
-    (ROOT / 'ru' / 'index.html').write_text(landing(RU), encoding='utf-8')
-    en, ru = privacy_pages(copy)
-    (ROOT / 'privacy.html').write_text(en, encoding='utf-8')
-    (ROOT / 'ru' / 'privacy.html').write_text(ru, encoding='utf-8')
-    print('built 4 pages')
+    pages = {'index.html': landing(EN), 'ru/index.html': landing(RU)}
+    pages['privacy.html'], pages['ru/privacy.html'] = privacy_pages(copy)
+    for g in GUIDES:
+        pages[g['slug']] = guide(g)
+    for path, text in pages.items():
+        write(path, text)
+    addresses = ['' if p == 'index.html' else p.replace('index.html', '') for p in pages]
+    write('sitemap.xml', sitemap(addresses))
+    write('robots.txt', f'User-agent: *\nAllow: /\n\nSitemap: {BASE}sitemap.xml\n')
+    print(f'built {len(pages)} pages, sitemap.xml, robots.txt')
 
 
 if __name__ == '__main__':

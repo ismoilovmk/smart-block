@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ismoilovmk.github.io/smart-block/sitemap.xml
