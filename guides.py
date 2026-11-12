@@ -37,9 +37,9 @@ EN_SHORTS = dict(
         ('ul', ['Shorts shelves on the home page, in search and in subscriptions;',
                 'the Shorts entry in the left menu and the Shorts tab on channels;',
                 'the “Shorts” filter above search results;',
-                'direct Shorts links, which go back to the home page instead.']),
+                'the swipe feed behind a Shorts link: a Short someone sends you opens as a normal video instead.']),
         ('p', 'Everything else on YouTube keeps working. If you need Shorts for a moment, pause the extension '
-              'for 15, 30 or 60 minutes and it switches back on by itself.'),
+              'for 15, 30 or 60 minutes, or until tomorrow, and it switches back on by itself.'),
         ('note', 'Other extensions do this too. Unhook is the best known and covers YouTube only. '
                  'Pick whichever you trust; the important part is that it removes Shorts in every place, not just one shelf.'),
         ('h2', 'Which one should you use?'),
@@ -101,8 +101,8 @@ EN_NEWS = dict(
         ('p', '<a href="./">Smart Block</a> is a free Chrome extension that removes just the news parts and leaves '
               'the rest of the results page as it was:'),
         ('ul', ['the “Top stories” block in results;',
-                'the News tab under the search box;',
-                'news.google.com, which goes to the regular Google home page instead.']),
+                'if you want, the News tab under the search box and news.google.com '
+                '(one switch, off until you turn it on).']),
         ('note', 'Looking for the news feed on your phone’s home screen or in the Google app? That is Google Discover, '
                  'a different feature. It is switched off in the Google app settings, not in the browser.'),
     ])
@@ -166,9 +166,9 @@ RU_SHORTS = dict(
         ('ul', ['полки Shorts на главной, в поиске и в подписках;',
                 'пункт Shorts в меню слева и вкладку Shorts на каналах;',
                 'фильтр «Shorts» над результатами поиска;',
-                'прямые ссылки на Shorts: вместо них открывается главная.']),
+                'ленту за ссылкой на Shorts: присланный вам ролик открывается как обычное видео.']),
         ('p', 'Всё остальное на YouTube работает как обычно. Если шортсы понадобились на минуту, поставьте паузу '
-              'на 15, 30 или 60 минут: потом расширение включится само.'),
+              'на 15, 30 или 60 минут либо до завтра: потом расширение включится само.'),
         ('note', 'Это умеют и другие расширения. Самое известное — Unhook, оно работает только с YouTube. '
                  'Выбирайте то, которому доверяете. Главное, чтобы шортсы убирались везде, а не только одна полка.'),
         ('h2', 'Что выбрать'),

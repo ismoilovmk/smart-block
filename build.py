@@ -37,7 +37,7 @@ EN = dict(
     note='Free. No account. Nothing leaves your browser.',
     what='What goes, what stays', gone='Removed', stay='Still works',
     gone_items=['YouTube Shorts, everywhere', 'The YouTube home feed', 'Related videos and end screens',
-                'Comments, if you want', '“Top stories” in Google Search', 'The Google News tab'],
+                'Comments, if you want', '“Top stories” in Google Search', 'The Google News tab, if you want'],
     stay_items=['YouTube search', 'Subscriptions', 'Playlists and history', 'The video you came for',
                 'Normal Google results', 'Images, Maps, everything else'],
     how='How it works',
@@ -46,7 +46,8 @@ EN = dict(
         'Changes apply at once, without reloading the page.',
         'YouTube’s own “hide Shorts” button brings them back after 30 days. '
         'Here they stay gone while the extension is on.',
-        'Need the feed for a moment? Pause for 15, 30 or 60 minutes. It switches back on by itself.',
+        'Need the feed for a moment? Pause for 15, 30 or 60 minutes, or until tomorrow. It switches back on by itself.',
+        'A Short someone sends you still opens, as a normal video with no feed to swipe.',
     ],
     priv_h='Nothing leaves your browser',
     priv_p='No analytics, no tracking, no network requests, no account. The extension runs only on '
@@ -70,7 +71,7 @@ RU = dict(
     note='Бесплатно. Без аккаунта. Ничего не покидает ваш браузер.',
     what='Что уходит и что остаётся', gone='Убрано', stay='Работает как раньше',
     gone_items=['Шортсы YouTube, везде', 'Лента на главной YouTube', 'Похожие видео и подсказки в конце',
-                'Комментарии, если хотите', '«Главные новости» в поиске Google', 'Вкладка «Новости» в Google'],
+                'Комментарии, если хотите', '«Главные новости» в поиске Google', 'Вкладка «Новости» в Google, если хотите'],
     stay_items=['Поиск по YouTube', 'Подписки', 'Плейлисты и история', 'Видео, за которым вы пришли',
                 'Обычные результаты Google', 'Картинки, Карты и всё остальное'],
     how='Как это работает',
@@ -79,7 +80,8 @@ RU = dict(
         'Изменения применяются сразу, без перезагрузки страницы.',
         'Встроенная кнопка YouTube «скрыть Shorts» возвращает их через 30 дней. '
         'Здесь они остаются убранными, пока расширение включено.',
-        'Нужна лента на минуту? Поставьте паузу на 15, 30 или 60 минут. Потом всё включится само.',
+        'Нужна лента на минуту? Поставьте паузу на 15, 30 или 60 минут либо до завтра. Потом всё включится само.',
+        'Shorts, который вам прислали, всё равно откроется: как обычное видео, без ленты.',
     ],
     priv_h='Ничего не покидает ваш браузер',
     priv_p='Нет аналитики, отслеживания, сетевых запросов и аккаунта. Расширение работает только на '

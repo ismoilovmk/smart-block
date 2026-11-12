@@ -18,6 +18,10 @@ it keeps stays in your own browser.
   addresses, video titles or search queries. They are saved with the Chrome
   `storage.local` API, stay on this device only, and days older than 60 days
   are deleted automatically.
+- **Already-counted Shorts**: so that reloading a page does not count the
+  same Short twice, the identifiers of Shorts already counted are kept in
+  the tab's own session storage. They never leave the tab and are erased
+  when the tab is closed.
 
 Neither the settings nor the counters ever reach the author of this
 extension or any third party.
@@ -30,7 +34,8 @@ The extension runs only on youtube.com and Google Search pages. There it:
   videos and comments, and the "Top stories" block and the News tab in
   Google Search;
 - redirects a few addresses inside the same sites, for example a YouTube
-  Shorts link to the YouTube home page, or news.google.com to google.com.
+  Shorts link to the same video in the regular player, or news.google.com to
+  google.com when that rule is switched on.
 
 To do this it looks at the structure of the page in your browser. Nothing
 about the pages, your searches, the videos you watch or your accounts is
@@ -59,7 +64,7 @@ updated before that version is released, and the date above will change.
 ## Contact
 
 Questions about this policy: open an issue at
-<https://github.com/ismoilovmk/-smart-block/issues>.
+<https://github.com/ismoilovmk/smart-block/issues>.
 
 ---
 
@@ -82,6 +87,10 @@ Smart Block не собирает, не передаёт и не продаёт 
   страниц, названий видео и поисковых запросов. Они сохраняются через
   `storage.local`, остаются только на этом устройстве, а дни старше 60 дней
   удаляются автоматически.
+- **Уже посчитанные Shorts**: чтобы перезагрузка страницы не считала один и
+  тот же Shorts дважды, идентификаторы посчитанных Shorts хранятся в
+  сессионном хранилище самой вкладки. Они не покидают вкладку и стираются,
+  когда она закрывается.
 
 Ни настройки, ни счётчики не попадают к автору расширения или третьим лицам.
 
@@ -93,7 +102,8 @@ Smart Block не собирает, не передаёт и не продаёт 
   комментарии на YouTube, блок «Главные новости» и вкладку «Новости» в
   поиске Google;
 - перенаправляет несколько адресов внутри тех же сайтов, например ссылку на
-  Shorts на главную YouTube или news.google.com на google.com.
+  Shorts на то же видео в обычном плеере или news.google.com на google.com,
+  если это правило включено.
 
 Для этого оно смотрит на структуру страницы в вашем браузере. Ничего о
 страницах, ваших запросах, видео или аккаунтах не записывается и никуда не
@@ -122,4 +132,4 @@ Smart Block не собирает, не передаёт и не продаёт 
 ## Контакты
 
 Вопросы по политике: создайте issue на
-<https://github.com/ismoilovmk/-smart-block/issues>.
+<https://github.com/ismoilovmk/smart-block/issues>.
